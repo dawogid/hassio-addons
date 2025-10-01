@@ -16,8 +16,8 @@ RUN arch=$(uname -m) && \
         armv6l) binary="donetick_Linux_armv6.tar.gz" ;; \
         *) echo "Unsupported architecture: $arch" && exit 1 ;; \
     esac && \
-    latest_release=$(curl --silent "https://api.github.com/repos/donetick/donetick/releases/latest" | jq -r .tag_name) && \
-    curl -fL "https://github.com/donetick/donetick/releases/download/${latest_release}/${binary}" | tar -xz -C /app/core
+    latest_release=$(curl --silent "https://api.github.com/repos/dawogid/donetick/releases/latest" | jq -r .tag_name) && \
+    curl -fL "https://github.com/dawogid/donetick/releases/download/${latest_release}/${binary}" | tar -xz -C /app/core
 
 # Copy entrypoint script
 COPY entrypoint.sh /app/entrypoint.sh
