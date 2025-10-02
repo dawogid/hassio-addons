@@ -31,7 +31,9 @@ jobs:
       - name: Convert addons list to JSON safely
         id: addons_json
         run: |
+          # Split space-separated list into array
           addons=(${{ steps.addons.outputs.addons }})
+          # Convert array to JSON
           json=$(printf '%s\n' "${addons[@]}" | jq -R . | jq -s .)
           echo "addons<<EOF" >> $GITHUB_OUTPUT
           echo "$json" >> $GITHUB_OUTPUT
@@ -90,12 +92,13 @@ jobs:
             echo "image=$img_name" >> $GITHUB_OUTPUT
 
             # Clear BUILD_ARGS on push
-            if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
+            if [[ -z "${GITHUB_HEAD_REF}" ]] && [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
               echo "BUILD_ARGS=" >> $GITHUB_ENV
             fi
           else
             echo "matrix_arch $matrix_arch is NOT supported for $addon, skipping"
             echo "build_arch=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Login to GitHub Container Registry
         if: steps.check.outputs.build_arch == 'true' && env.BUILD_ARGS != '--test'
