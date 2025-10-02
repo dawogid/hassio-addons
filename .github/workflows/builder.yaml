@@ -12,42 +12,59 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:  # manual trigger option
 
 jobs:
   init:
     runs-on: ubuntu-latest
     name: Initialize builds
     outputs:
-      addons: ${{ steps.addons_json.outputs.addons }}
+      changed_addons: ${{ steps.changed_addons.outputs.addons }}
+      changed: ${{ steps.changed_addons.outputs.changed }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4.2.0
+
+      - name: Get changed files
+        id: changed_files
+        uses: jitterbit/get-changed-files@v1
 
       - name: Find add-on directories
         id: addons
         uses: home-assistant/actions/helpers/find-addons@master
 
-      - name: Convert addons list to JSON safely
-        id: addons_json
+      - name: Get changed add-ons
+        id: changed_addons
         run: |
-          # Split space-separated list into array
-          addons=(${{ steps.addons.outputs.addons }})
-          # Convert array to JSON
-          json=$(printf '%s\n' "${addons[@]}" | jq -R . | jq -s .)
-          echo "addons<<EOF" >> $GITHUB_OUTPUT
-          echo "$json" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "Converted addons: $json"
+          declare -a changed_addons
+          for addon in ${{ steps.addons.outputs.addons }}; do
+            if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon ]]; then
+              for file in ${{ env.MONITORED_FILES }}; do
+                  if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon/$file ]]; then
+                    if [[ ! "${changed_addons[@]}" =~ $addon ]]; then
+                      changed_addons+=("\"${addon}\",");
+                    fi
+                  fi
+              done
+            fi
+          done
 
+          changed=$(echo ${changed_addons[@]} | rev | cut -c 2- | rev)
+
+          if [[ -n ${changed} ]]; then
+            echo "Changed add-ons: $changed";
+            echo "changed=true" >> $GITHUB_OUTPUT;
+            echo "addons=[$changed]" >> $GITHUB_OUTPUT;
+          else
+            echo "No add-on had any monitored files changed (${{ env.MONITORED_FILES }})";
+          fi
   build:
     needs: init
     runs-on: ubuntu-latest
-    name: Build ${{ matrix.addon }} add-on
+    if: needs.init.outputs.changed == 'true'
+    name: Build ${{ matrix.arch }} ${{ matrix.addon }} add-on
     strategy:
-      fail-fast: false
       matrix:
-        addon: ${{ fromJson(needs.init.outputs.addons) }}
+        addon: ${{ fromJson(needs.init.outputs.changed_addons) }}
         arch: ["aarch64", "amd64", "armv7"]
     permissions:
       contents: read
@@ -57,51 +74,31 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4.2.0
 
-      - name: Get add-on information
+      - name: Get information
         id: info
         uses: home-assistant/actions/helpers/info@master
         with:
           path: "./${{ matrix.addon }}"
 
-      - name: Determine supported architectures and build
+      - name: Check if add-on should be built
         id: check
-        shell: bash
         run: |
-          image="${{ steps.info.outputs.image }}"
-          archs="${{ steps.info.outputs.architectures }}"
-          addon="${{ matrix.addon }}"
-          matrix_arch="${{ matrix.arch }}"
-
-          echo "DEBUG: image='$image'"
-          echo "DEBUG: archs='$archs'"
-          echo "DEBUG: addon='$addon'"
-          echo "DEBUG: matrix_arch='$matrix_arch'"
-
-          # Skip if no image defined
-          if [[ -z "$image" || "$image" == "null" ]]; then
-            echo "No image defined for $addon, skipping"
-            echo "build_arch=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          # Only build if the matrix architecture is supported
-          if [[ "$archs" =~ "$matrix_arch" ]]; then
-            echo "matrix_arch $matrix_arch is supported for $addon"
-            echo "build_arch=true" >> $GITHUB_OUTPUT
-            img_name=$(echo "$image" | cut -d'/' -f3)
-            echo "image=$img_name" >> $GITHUB_OUTPUT
-
-            # Clear BUILD_ARGS on push
-            if [[ -z "${GITHUB_HEAD_REF}" ]] && [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-              echo "BUILD_ARGS=" >> $GITHUB_ENV
+          if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
+            echo "Image property is not defined, skipping build"
+            echo "build_arch=false" >> $GITHUB_OUTPUT;
+          elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
+            echo "build_arch=true" >> $GITHUB_OUTPUT;
+            echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
+            if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
+                echo "BUILD_ARGS=" >> $GITHUB_ENV;
             fi
           else
-            echo "matrix_arch $matrix_arch is NOT supported for $addon, skipping"
-            echo "build_arch=false" >> $GITHUB_OUTPUT
+            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build";
+            echo "build_arch=false" >> $GITHUB_OUTPUT;
           fi
 
       - name: Login to GitHub Container Registry
-        if: steps.check.outputs.build_arch == 'true' && env.BUILD_ARGS != '--test'
+        if: env.BUILD_ARGS != '--test'
         uses: docker/login-action@v3.3.0
         with:
           registry: ghcr.io
