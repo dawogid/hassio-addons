@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Initialize builds
     outputs:
-      addons: ${{ steps.addons.outputs.addons }}
+      addons: ${{ steps.addons_json.outputs.addons }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4.2.0
@@ -27,6 +27,16 @@ jobs:
       - name: Find add-on directories
         id: addons
         uses: home-assistant/actions/helpers/find-addons@master
+
+      - name: Convert addons list to JSON
+        id: addons_json
+        run: |
+          # Split space-separated string into array
+          addons=(${{ steps.addons.outputs.addons }})
+          # Convert to JSON array
+          json=$(printf '%s\n' "${addons[@]}" | jq -R . | jq -s .)
+          echo "addons=$json" >> $GITHUB_OUTPUT
+          echo "Converted addons: $json"
 
   build:
     needs: init
@@ -55,17 +65,16 @@ jobs:
         run: |
           if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
             echo "Image property is not defined, skipping build"
-            echo "build_arch=false" >> $GITHUB_OUTPUT;
+            echo "build_arch=false" >> $GITHUB_OUTPUT
           elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
-            echo "build_arch=true" >> $GITHUB_OUTPUT;
-            echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
+            echo "build_arch=true" >> $GITHUB_OUTPUT
+            echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT
             if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
-                echo "BUILD_ARGS=" >> $GITHUB_ENV;
+                echo "BUILD_ARGS=" >> $GITHUB_ENV
             fi
           else
-            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build";
-            echo "build_arch=false" >> $GITHUB_OUTPUT;
-          fi
+            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build"
+            echo "build_arch=false" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
         if: env.BUILD_ARGS != '--test'
