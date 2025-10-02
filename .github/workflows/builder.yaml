@@ -28,14 +28,17 @@ jobs:
         id: addons
         uses: home-assistant/actions/helpers/find-addons@master
 
-      - name: Convert addons list to JSON
+      - name: Convert addons list to JSON safely
         id: addons_json
         run: |
-          # Split space-separated string into array
+          # Split space-separated list into array
           addons=(${{ steps.addons.outputs.addons }})
-          # Convert to JSON array
+          # Convert array to JSON
           json=$(printf '%s\n' "${addons[@]}" | jq -R . | jq -s .)
-          echo "addons=$json" >> $GITHUB_OUTPUT
+          # Use a delimiter to safely write JSON to GitHub Actions output
+          echo "addons<<EOF" >> $GITHUB_OUTPUT
+          echo "$json" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
           echo "Converted addons: $json"
 
   build:
