@@ -31,11 +31,8 @@ jobs:
       - name: Convert addons list to JSON safely
         id: addons_json
         run: |
-          # Split space-separated list into array
           addons=(${{ steps.addons.outputs.addons }})
-          # Convert array to JSON
           json=$(printf '%s\n' "${addons[@]}" | jq -R . | jq -s .)
-          # Safely write JSON to GitHub Actions output
           echo "addons<<EOF" >> $GITHUB_OUTPUT
           echo "$json" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -44,9 +41,9 @@ jobs:
   build:
     needs: init
     runs-on: ubuntu-latest
-    name: Build ${{ matrix.arch }} ${{ matrix.addon }} add-on
+    name: Build ${{ matrix.addon }} add-on
     strategy:
-      fail-fast: false  # continue other builds if one fails
+      fail-fast: false
       matrix:
         addon: ${{ fromJson(needs.init.outputs.addons) }}
         arch: ["aarch64", "amd64", "armv7"]
@@ -58,47 +55,50 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4.2.0
 
-      - name: Get information
+      - name: Get add-on information
         id: info
         uses: home-assistant/actions/helpers/info@master
         with:
           path: "./${{ matrix.addon }}"
 
-      - name: Check if add-on should be built
+      - name: Determine supported architectures and build
         id: check
         shell: bash
         run: |
-          # Assign GitHub Actions outputs and matrix variables to bash variables safely
           image="${{ steps.info.outputs.image }}"
           archs="${{ steps.info.outputs.architectures }}"
           addon="${{ matrix.addon }}"
           matrix_arch="${{ matrix.arch }}"
 
-          # Debug output
           echo "DEBUG: image='$image'"
           echo "DEBUG: archs='$archs'"
           echo "DEBUG: addon='$addon'"
           echo "DEBUG: matrix_arch='$matrix_arch'"
 
-          # Check image existence
+          # Skip if no image defined
           if [[ -z "$image" || "$image" == "null" ]]; then
-            echo "Image property is not defined, skipping build"
+            echo "No image defined for $addon, skipping"
             echo "build_arch=false" >> $GITHUB_OUTPUT
-          elif [[ "$archs" =~ "$matrix_arch" ]]; then
+            exit 0
+          fi
+
+          # Only build if the matrix architecture is supported
+          if [[ "$archs" =~ "$matrix_arch" ]]; then
+            echo "matrix_arch $matrix_arch is supported for $addon"
             echo "build_arch=true" >> $GITHUB_OUTPUT
             img_name=$(echo "$image" | cut -d'/' -f3)
             echo "image=$img_name" >> $GITHUB_OUTPUT
 
-            # Clear BUILD_ARGS on push if not a PR
+            # Clear BUILD_ARGS on push
             if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
               echo "BUILD_ARGS=" >> $GITHUB_ENV
             fi
           else
-            echo "$matrix_arch is not a valid arch for $addon, skipping build"
+            echo "matrix_arch $matrix_arch is NOT supported for $addon, skipping"
             echo "build_arch=false" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
-        if: env.BUILD_ARGS != '--test'
+        if: steps.check.outputs.build_arch == 'true' && env.BUILD_ARGS != '--test'
         uses: docker/login-action@v3.3.0
         with:
           registry: ghcr.io
