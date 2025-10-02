@@ -7,7 +7,7 @@ This is the official add-on for [Donetick](https://github.com/donetick/donetick)
 
 ## Installation Instructions
 
-### Step 1: Add the Repository to Home Assistant
+### Step 1: Add the Repository to Home Assistant 
 
 1. Open **Home Assistant** in your web browser.
 2. Go to **Settings** > **Add-ons** > **Add-on Store**.
