@@ -4,7 +4,16 @@
 # Envirment variables:
 export DT_TELEGRAM_TOKEN=$(bashio::config 'telegram_token')
 export DT_PUSHOVER_TOKEN=$(bashio::config 'pushover_token')
-export DT_DISABLE_SIGNUP=$(bashio::config 'disable_signup')
+DISABLE_SIGNUP_VAL=$(bashio::config 'disable_signup')
+IS_USER_CREATION_DISABLED_VAL=$(bashio::config 'is_user_creation_disabled')
+FINAL_DISABLE_VAL=${DISABLE_SIGNUP_VAL}
+if [ "${IS_USER_CREATION_DISABLED_VAL}" = "true" ]; then
+    FINAL_DISABLE_VAL=true
+fi
+# Export under multiple env var names for compatibility with different Donetick versions
+export DT_DISABLE_SIGNUP=${FINAL_DISABLE_VAL}
+export DONETICK_DISABLE_SIGNUP=${FINAL_DISABLE_VAL}
+export DT_IS_USER_CREATION_DISABLED=${FINAL_DISABLE_VAL}
 
 
 export DT_OAUTH2_CLIENT_ID=$(bashio::config 'oauth2_client_id')

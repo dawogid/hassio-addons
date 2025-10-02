@@ -1,5 +1,5 @@
 name: Donetick Addon Test
-version: "1.1.67"
+version: "1.1.69"
 slug: donetick
 description: Simplify Tasks & Chores, Together.
 url: "https://github.com/dawogid/hassio-addons/tree/main/donetick"
@@ -25,6 +25,7 @@ options:
   telegram_token: ""
   pushover_token: ""
   disable_signup: false
+  is_user_creation_disabled: false
   auth_provider: ""
   oauth2_client_id: ""
   oauth2_client_secret: ""
@@ -39,6 +40,7 @@ schema:
   telegram_token: "str?"
   pushover_token: "str?"
   disable_signup: "bool?"
+  is_user_creation_disabled: "bool?"
   auth_provider: "str?"
   oauth2_client_id: "str?"
   oauth2_client_secret: "str?"

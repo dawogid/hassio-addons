@@ -1,4 +1,10 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
+## 1.1.68:
+Add-on now supports disabling user signup via `disable_signup: true` which maps to Donetick's `is_user_creation_disabled` flag. Environment variable compatibility (`DONETICK_DISABLE_SIGNUP`, `DT_DISABLE_SIGNUP`, `DT_IS_USER_CREATION_DISABLED`) added. Also fixed a minor typo in OAuth2 secret export in run script.
+
+## 1.1.69:
+Added explicit `is_user_creation_disabled` option in add-on config. Either `disable_signup` or `is_user_creation_disabled` set to true will disable user creation. Scripts now merge both and export a unified value.
+
 ## 1.1.60:
 Improve impersonate user functionality and fix the issue where the user is unable to start, pause, and complete tasks
 Release new version for app store and new Android APK

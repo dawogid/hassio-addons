@@ -44,3 +44,30 @@ Donetick is an open-source, user-friendly app designed to help you organize task
 [armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg
 [armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
 [i386-shield]: https://img.shields.io/badge/i386-yes-green.svg
+
+## Configuration
+
+Key option highlights:
+
+| Option | Description |
+|--------|-------------|
+| `disable_signup` | When set to `true`, no new user accounts can be created (sign-up endpoint returns HTTP 403). This maps to Donetick's internal `is_user_creation_disabled` flag. |
+
+The add-on exports the value of `disable_signup` to the backend using multiple environment variables for compatibility with different Donetick versions:
+
+```
+DONETICK_DISABLE_SIGNUP
+DT_DISABLE_SIGNUP
+DT_IS_USER_CREATION_DISABLED
+```
+
+Any of these set to `true`, `1`, or `yes` will disable user creation. Setting to `false`, `0`, or `no` re‑enables signups (unless disabled in the YAML config itself).
+
+Example add-on configuration snippet:
+
+```yaml
+disable_signup: true
+jwt_secret: "<your-secure-32+char-secret>"
+```
+
+After saving, restart the add-on. Attempts to create a new user via the API or UI signup form will be blocked with `403 {"error":"User creation is disabled"}`.
