@@ -25,17 +25,12 @@ export DT_OAUTH2_USER_INFO_URL=$(bashio::config 'oauth2_user_info_url')
 export DT_OAUTH2_NAME=$(bashio::config 'oauth2_name')
 export DT_JWT_SECRET=$(bashio::config 'jwt_secret')
 
-# Storage (S3-compatible) configuration
-if bashio::config.has_value 'storage_type'; then export DT_STORAGE_STORAGE_TYPE=$(bashio::config 'storage_type'); fi
+# Storage (S3-compatible) configuration (only user-supplied essentials)
 if bashio::config.has_value 'storage_bucket'; then export DT_STORAGE_BUCKET_NAME=$(bashio::config 'storage_bucket'); fi
-if bashio::config.has_value 'storage_region'; then export DT_STORAGE_REGION=$(bashio::config 'storage_region'); fi
-if bashio::config.has_value 'storage_base_path'; then export DT_STORAGE_BASE_PATH=$(bashio::config 'storage_base_path'); fi
 if bashio::config.has_value 'storage_access_key'; then export DT_STORAGE_ACCESS_KEY=$(bashio::config 'storage_access_key'); fi
 if bashio::config.has_value 'storage_secret_key'; then export DT_STORAGE_SECRET_KEY=$(bashio::config 'storage_secret_key'); fi
 if bashio::config.has_value 'storage_endpoint'; then export DT_STORAGE_ENDPOINT=$(bashio::config 'storage_endpoint'); fi
 if bashio::config.has_value 'storage_public_host'; then export DT_STORAGE_PUBLIC_HOST=$(bashio::config 'storage_public_host'); fi
-if bashio::config.has_value 'storage_max_user_storage'; then export DT_STORAGE_MAX_USER_STORAGE=$(bashio::config 'storage_max_user_storage'); fi
-if bashio::config.has_value 'storage_max_file_size'; then export DT_STORAGE_MAX_FILE_SIZE=$(bashio::config 'storage_max_file_size'); fi
 
 # Start donetick backend and save PID 
 bashio::log.info "Starting Donetick backend..."

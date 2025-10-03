@@ -1,5 +1,5 @@
-name: Donetick Addon Test
-version: "1.1.70"
+name: Donetick Addon Dawogid
+version: "1.1.71"
 slug: donetick
 description: Simplify Tasks & Chores, Together.
 url: "https://github.com/dawogid/hassio-addons/tree/main/donetick"
@@ -35,16 +35,11 @@ options:
   oauth2_user_info_url: ""
   oauth2_name: ""
   jwt_secret: ""
-  storage_type: "remote"
   storage_bucket: ""
-  storage_region: ""
-  storage_base_path: "assets"
   storage_access_key: ""
   storage_secret_key: ""
   storage_endpoint: ""
   storage_public_host: ""
-  storage_max_user_storage: 1073741824
-  storage_max_file_size: 10485760
 
 schema:
   telegram_token: "str?"
@@ -60,13 +55,8 @@ schema:
   oauth2_user_info_url: "str?"
   oauth2_name: "str?"
   jwt_secret: "str?"
-  storage_type: "str?"
   storage_bucket: "str?"
-  storage_region: "str?"
-  storage_base_path: "str?"
   storage_access_key: "str?"
   storage_secret_key: "str?"
   storage_endpoint: "str?"
   storage_public_host: "str?"
-  storage_max_user_storage: "int?"
-  storage_max_file_size: "int?"
