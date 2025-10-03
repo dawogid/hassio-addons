@@ -31,6 +31,16 @@ export DT_OAUTH2_USER_INFO_URL=$(bashio::config 'oauth2_user_info_url')
 export DT_OAUTH2_NAME=$(bashio::config 'oauth2_name')
 export DT_JWT_SECRET=$(bashio::config 'jwt_secret')
 
+# Database (Postgres / Supabase) configuration
+if bashio::config.has_value 'db_type'; then export DT_DATABASE_TYPE=$(bashio::config 'db_type'); fi
+if bashio::config.has_value 'db_host'; then export DT_DATABASE_HOST=$(bashio::config 'db_host'); fi
+if bashio::config.has_value 'db_port'; then export DT_DATABASE_PORT=$(bashio::config 'db_port'); fi
+if bashio::config.has_value 'db_user'; then export DT_DATABASE_USER=$(bashio::config 'db_user'); fi
+if bashio::config.has_value 'db_password'; then export DT_DATABASE_PASSWORD=$(bashio::config 'db_password'); fi
+if bashio::config.has_value 'db_name'; then export DT_DATABASE_NAME=$(bashio::config 'db_name'); fi
+if bashio::config.has_value 'db_sslmode'; then export DT_DATABASE_SSLMODE=$(bashio::config 'db_sslmode'); fi
+export DT_DATABASE_MIGRATION=true
+
 # Storage (S3-compatible) configuration (only user-supplied essentials)
 if bashio::config.has_value 'storage_bucket'; then export DT_STORAGE_BUCKET_NAME=$(bashio::config 'storage_bucket'); fi
 if bashio::config.has_value 'storage_access_key'; then export DT_STORAGE_ACCESS_KEY=$(bashio::config 'storage_access_key'); fi
