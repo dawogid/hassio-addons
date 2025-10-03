@@ -25,7 +25,7 @@ options:
   telegram_token: ""
   pushover_token: ""
   disable_signup: false
-  is_user_creation_disabled: false
+  is_user_creation_disabled: true
   auth_provider: ""
   oauth2_client_id: ""
   oauth2_client_secret: ""
@@ -43,8 +43,8 @@ options:
   storage_secret_key: ""
   storage_endpoint: ""
   storage_public_host: ""
-  storage_max_user_storage: 0
-  storage_max_file_size: 0
+  storage_max_user_storage: 1073741824
+  storage_max_file_size: 10485760
 
 schema:
   telegram_token: "str?"
