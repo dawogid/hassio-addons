@@ -1,5 +1,5 @@
-
 # Donetick Selfhosted : Hassio Add-on
+
 #### **Simplify Tasks & Chores, Together!**
 
 Donetick is an open-source, user-friendly app designed to help you organize tasks and chores effectively.featuring customizable options to help you and others stay organized
@@ -7,6 +7,7 @@ Donetick is an open-source, user-friendly app designed to help you organize task
 ![Screenshot](https://github.com/donetick/donetick/raw/main/assets/screenshot.png)
 
 ## Features
+
 🏰 Group-Based Task Management: Create and manage tasks solo or with your family or friends in shared circles.
 
 ✨ One-Sentence Task Creation[Experimental] : Create tasks by simply describing them in a sentence. Donetick will extracts dates, times, and recurrence patterns from your natural language."Take the trash out every Monday and Tuesday at 6:15 pm" will automatically generate the correct task.
@@ -31,8 +32,6 @@ Donetick is an open-source, user-friendly app designed to help you organize task
 
 🔑 SSO/OIDC Support: Integrate with identity providers using Single Sign-On and OpenID Connect.
 
-
-
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
 ![Supports armhf Architecture][armhf-shield]
@@ -49,8 +48,8 @@ Donetick is an open-source, user-friendly app designed to help you organize task
 
 Key option highlights:
 
-| Option | Description |
-|--------|-------------|
+| Option           | Description                                                                                                                                                     |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `disable_signup` | When set to `true`, no new user accounts can be created (sign-up endpoint returns HTTP 403). This maps to Donetick's internal `is_user_creation_disabled` flag. |
 
 The add-on exports the value of `disable_signup` to the backend using multiple environment variables for compatibility with different Donetick versions:
