@@ -33,6 +33,7 @@ if bashio::config.has_value 'db_user'; then export DT_DATABASE_USER=$(bashio::co
 if bashio::config.has_value 'db_password'; then export DT_DATABASE_PASSWORD=$(bashio::config 'db_password'); fi
 if bashio::config.has_value 'db_name'; then export DT_DATABASE_NAME=$(bashio::config 'db_name'); fi
 if bashio::config.has_value 'db_sslmode'; then export DT_DATABASE_SSLMODE=$(bashio::config 'db_sslmode'); fi
+if bashio::config.has_value 'db_migration_timeout'; then export DT_DATABASE_MIGRATION_TIMEOUT=$(bashio::config 'db_migration_timeout'); fi
 export DT_DATABASE_MIGRATION=true
 
 # Storage (S3-compatible) configuration (only user-supplied essentials)

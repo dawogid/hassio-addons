@@ -1,5 +1,5 @@
 name: Donetick Addon Dawogid
-version: "1.1.71"
+version: "1.1.74"
 slug: donetick
 description: Simplify Tasks & Chores, Together.
 url: "https://github.com/dawogid/hassio-addons/tree/main/donetick"
@@ -42,6 +42,7 @@ options:
   db_password: ""
   db_name: "donetick"
   db_sslmode: "require"
+  db_migration_timeout: "3m"
   storage_bucket: ""
   storage_access_key: ""
   storage_secret_key: ""
@@ -69,6 +70,7 @@ schema:
   db_password: "str?"
   db_name: "str?"
   db_sslmode: "str?"
+  db_migration_timeout: "str?"
   storage_bucket: "str?"
   storage_access_key: "str?"
   storage_secret_key: "str?"
