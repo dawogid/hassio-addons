@@ -1,9 +1,9 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
 name: Donetick Addon
-version: "1.1.64"
+version: "1.1.641"
 slug: Donetick
 description: Simplify Tasks & Chores, Together.
-url: "https://github.com/Donetick/hassio-addons/tree/main/donetick"
+url: "https://github.com/dawogid/hassio-addons/tree/main/donetick"
 arch:
   - armv7
   - aarch64
@@ -20,14 +20,13 @@ ports:
   80/tcp: 8005
   2021/tcp: 2021
 webui: http://[HOST]:[PORT:2021]
-image: "ghcr.io/donetick/{arch}-hassio-addons"
-
-
+image: "ghcr.io/dawogid/{arch}-hassio-addons"
 
 options:
   telegram_token: ""
   pushover_token: ""
   disable_signup: false
+  is_user_creation_disabled: true
   auth_provider: ""
   oauth2_client_id: ""
   oauth2_client_secret: ""
@@ -37,12 +36,20 @@ options:
   oauth2_user_info_url: ""
   oauth2_name: ""
   jwt_secret: ""
-
+  db_type: "postgres"
+  db_host: ""
+  db_password: ""
+  db_port: 5432
+  db_user: "postgres"
+  db_name: "postgres"
+  db_sslmode: "require"
+  db_migration_timeout: "3m"
 
 schema:
   telegram_token: "str?"
   pushover_token: "str?"
   disable_signup: "bool?"
+  is_user_creation_disabled: "bool?"
   auth_provider: "str?"
   oauth2_client_id: "str?"
   oauth2_client_secret: "str?"
@@ -52,4 +59,11 @@ schema:
   oauth2_user_info_url: "str?"
   oauth2_name: "str?"
   jwt_secret: "str?"
-
+  db_type: "str?"
+  db_host: "str?"
+  db_password: "str?"
+  db_port: "int?"
+  db_user: "str?"
+  db_name: "str?"
+  db_sslmode: "str?"
+  db_migration_timeout: "str?"

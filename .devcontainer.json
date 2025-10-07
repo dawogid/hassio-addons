@@ -1,6 +1,6 @@
 {
-  "name": "Donetick Addons",
-  "image": "ghcr.io/donetick/hassio-addons:latest",
+  "name": "Donetick Addons Dawogid Fork",
+  "image": "ghcr.io/dawogid/hassio-addons:latest",
   "appPort": ["2021:2021", "2022:80"],
   "postStartCommand": "bash devcontainer_bootstrap",
   "runArgs": ["-e", "GIT_EDITOR=code --wait", "--privileged"],

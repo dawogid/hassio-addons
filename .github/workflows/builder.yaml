@@ -1,7 +1,7 @@
 name: Builder
 
 env:
-  BUILD_ARGS: "--test"
+  BUILD_ARGS: ""
   MONITORED_FILES: "build.yaml config.yaml Dockerfile rootfs"
 
 on:
@@ -39,11 +39,11 @@ jobs:
           for addon in ${{ steps.addons.outputs.addons }}; do
             if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon ]]; then
               for file in ${{ env.MONITORED_FILES }}; do
-                  if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon/$file ]]; then
-                    if [[ ! "${changed_addons[@]}" =~ $addon ]]; then
-                      changed_addons+=("\"${addon}\",");
-                    fi
+                if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon/$file ]]; then
+                  if [[ ! "${changed_addons[@]}" =~ $addon ]]; then
+                    changed_addons+=("\"${addon}\",");
                   fi
+                fi
               done
             fi
           done
@@ -57,6 +57,7 @@ jobs:
           else
             echo "No add-on had any monitored files changed (${{ env.MONITORED_FILES }})";
           fi
+
   build:
     needs: init
     runs-on: ubuntu-latest
@@ -89,21 +90,18 @@ jobs:
           elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
             echo "build_arch=true" >> $GITHUB_OUTPUT;
             echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
-            if [[ -z "${{ github.head_ref }}" ]] && [[ "${{ github.event_name }}" == "push" ]]; then
-                echo "BUILD_ARGS=" >> $GITHUB_ENV;
-            fi
           else
             echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build";
             echo "build_arch=false" >> $GITHUB_OUTPUT;
           fi
 
       - name: Login to GitHub Container Registry
-        if: env.BUILD_ARGS != '--test'
+        if: steps.check.outputs.build_arch == 'true'
         uses: docker/login-action@v3.3.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PAT != '' && secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Build ${{ matrix.addon }} add-on
         if: steps.check.outputs.build_arch == 'true'

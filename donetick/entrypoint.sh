@@ -4,9 +4,6 @@
 # Envirment variables:
 export DT_TELEGRAM_TOKEN=$(bashio::config 'telegram_token')
 export DT_PUSHOVER_TOKEN=$(bashio::config 'pushover_token')
-export DT_DISABLE_SIGNUP=$(bashio::config 'disable_signup')
-
-
 export DT_OAUTH2_CLIENT_ID=$(bashio::config 'oauth2_client_id')
 export DT_OAUTH2_CLIENT_SECRET=$(bashio::config 'oauth2_client_secret')
 export DT_OAUTH2_REDIRECT_URI=$(bashio::config 'oauth2_redirect_uri')
@@ -15,6 +12,29 @@ export DT_OAUTH2_TOKEN_URL=$(bashio::config 'oauth2_token_url')
 export DT_OAUTH2_USER_INFO_URL=$(bashio::config 'oauth2_user_info_url')
 export DT_OAUTH2_NAME=$(bashio::config 'oauth2_name')
 export DT_JWT_SECRET=$(bashio::config 'jwt_secret')
+
+# Disable login and user creation
+DISABLE_SIGNUP_VAL=$(bashio::config 'disable_signup')
+IS_USER_CREATION_DISABLED_VAL=$(bashio::config 'is_user_creation_disabled')
+FINAL_DISABLE_VAL=${DISABLE_SIGNUP_VAL}
+if [ "${IS_USER_CREATION_DISABLED_VAL}" = "true" ]; then
+    FINAL_DISABLE_VAL=true
+fi
+# Export under multiple env var names for compatibility with different Donetick versions
+export DT_DISABLE_SIGNUP=${FINAL_DISABLE_VAL}
+export DONETICK_DISABLE_SIGNUP=${FINAL_DISABLE_VAL}
+export DT_IS_USER_CREATION_DISABLED=${FINAL_DISABLE_VAL}
+
+# Database (Postgres / Supabase) configuration
+if bashio::config.has_value 'db_type'; then export DT_DATABASE_TYPE=$(bashio::config 'db_type'); fi
+if bashio::config.has_value 'db_host'; then export DT_DATABASE_HOST=$(bashio::config 'db_host'); fi
+if bashio::config.has_value 'db_port'; then export DT_DATABASE_PORT=$(bashio::config 'db_port'); fi
+if bashio::config.has_value 'db_user'; then export DT_DATABASE_USER=$(bashio::config 'db_user'); fi
+if bashio::config.has_value 'db_password'; then export DT_DATABASE_PASSWORD=$(bashio::config 'db_password'); fi
+if bashio::config.has_value 'db_name'; then export DT_DATABASE_NAME=$(bashio::config 'db_name'); fi
+if bashio::config.has_value 'db_sslmode'; then export DT_DATABASE_SSLMODE=$(bashio::config 'db_sslmode'); fi
+if bashio::config.has_value 'db_migration_timeout'; then export DT_DATABASE_MIGRATION_TIMEOUT=$(bashio::config 'db_migration_timeout'); fi
+export DT_DATABASE_MIGRATION=true
 
 # Start donetick backend and save PID 
 bashio::log.info "Starting Donetick backend..."
